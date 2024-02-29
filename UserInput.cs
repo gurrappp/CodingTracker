@@ -6,7 +6,24 @@ using System.Threading.Tasks;
 
 namespace CodingTracker
 {
-    internal class UserInput
+    public class UserInput
     {
+
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+
+        public DateTime StartSession(string time)
+        {
+
+            if (!DateTime.TryParse(time.ToString(), out var _))
+            {
+                time = DateTime.Today.ToString();
+            }
+
+            return time;
+
+        }
+
+
     }
 }

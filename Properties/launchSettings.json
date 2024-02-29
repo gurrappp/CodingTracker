@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "CodingTracker": {
+      "commandName": "Project",
+      "commandLineArgs": "ConfigPath=\"../../../\"",
+      "workingDirectory": "."
+    }
+  }
+}
