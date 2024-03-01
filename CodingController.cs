@@ -17,17 +17,19 @@ namespace CodingTracker
         public static void Main(string[] args)
         {
             SetupDatabase();
+            StartMessage();
+            ShowSessions();
 
             CodingSession session = new CodingSession();
             UserInput userInput = new UserInput();
 
 
+            userInput.SetStartDateTime();
 
-            var userInputStart = Console.ReadLine();
-            session.StartTime = userInput.StartSession(userInputStart);
+            session.StartTime = userInput.StartSession(userInput.StartTime);
 
-            AnsiConsole.Markup($"[underline red]{DateTime.Now}[/]!");
 
+            Console.ReadLine();
 
         }
 
@@ -54,5 +56,38 @@ namespace CodingTracker
             }
         }
 
+        public static void StartMessage()
+        {
+            //var font = FigletFont.Load("starwars.flf");
+
+            AnsiConsole.Write(
+                new FigletText("CODING TRACKER")
+                    .Centered()
+                    .Color(Color.Red));
+        }
+        public static void Menu()
+        {
+            AnsiConsole.Markup($"[underline red] Can't parse input! using DateTime.Now[/]!");
+
+        }
+
+        public static void ShowSessions()
+        {
+            var grid = new Grid();
+
+            // Add columns 
+            grid.AddColumn();
+            grid.AddColumn();
+            grid.AddColumn();
+            grid.AddColumn();
+
+            // Add header row 
+            grid.AddRow(new string[] { "Id", "Duration", "StartTime", "EndTime" });
+            grid.AddRow(new string[] { "Row 1", "Row 2", "Row 3" , "Row 4"});
+
+            // Write to Console
+            AnsiConsole.Write(grid);
+
+        }
     }
 }

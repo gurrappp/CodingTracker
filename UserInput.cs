@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Spectre.Console;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,18 +14,29 @@ namespace CodingTracker
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
 
-        public DateTime StartSession(string time)
+        public IFormatProvider FormatProvider = CultureInfo.CurrentCulture;
+
+        public void SetStartDateTime()
         {
+            // 2024-03-01 23:59:59
+            AnsiConsole.Markup($"[blue] start time? format: yyyy-MM-dd HH:mm:ss[/]!\n");
+            
+            var readLine = Console.ReadLine();
 
-            if (!DateTime.TryParse(time.ToString(), out var _))
+            
+
+            if (DateTime.TryParse(readLine, FormatProvider, DateTimeStyles.None, out var result))
             {
-                time = DateTime.Today.ToString();
+                StartTime = result;
             }
-
-            return time;
-
+            else
+            {
+                AnsiConsole.Markup($"[underline red] Can't parse input! using DateTime.Now[/]!");
+                StartTime = DateTime.Now;
+            }
         }
 
-
+        public DateTime StartSession(DateTime startTime) => startTime;
+        
     }
 }
