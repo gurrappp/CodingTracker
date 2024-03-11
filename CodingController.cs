@@ -16,13 +16,12 @@ namespace CodingTracker
     {
         public static void Main(string[] args)
         {
-            SetupDatabase();
-            StartMessage();
-            ShowSessions();
-
             CodingSession session = new CodingSession();
             UserInput userInput = new UserInput();
 
+            SetupDatabase();
+            StartMessage();
+            ShowSessions();
 
             userInput.SetStartDateTime();
 
@@ -65,6 +64,7 @@ namespace CodingTracker
                     .Centered()
                     .Color(Color.Red));
         }
+
         public static void Menu()
         {
             AnsiConsole.Markup($"[underline red] Can't parse input! using DateTime.Now[/]!");
@@ -73,20 +73,39 @@ namespace CodingTracker
 
         public static void ShowSessions()
         {
-            var grid = new Grid();
+            //var grid = new Grid();
 
-            // Add columns 
-            grid.AddColumn();
-            grid.AddColumn();
-            grid.AddColumn();
-            grid.AddColumn();
+            //// Add columns 
+            //grid.AddColumn();
+            //grid.AddColumn();
+            //grid.AddColumn();
+            //grid.AddColumn();
 
-            // Add header row 
-            grid.AddRow(new string[] { "Id", "Duration", "StartTime", "EndTime" });
-            grid.AddRow(new string[] { "Row 1", "Row 2", "Row 3" , "Row 4"});
+            //// Add header row 
+            //grid.AddRow(new string[] { "Id", "Duration", "StartTime", "EndTime" });
+            //grid.AddRow(new string[] { "Col 1", "Col 2", "Col 3" , "Col 4"});
 
-            // Write to Console
-            AnsiConsole.Write(grid);
+
+            //// Write to Console
+            //AnsiConsole.Write(grid);
+
+            // Create a table
+            var table = new Table();
+
+            // Add some columns
+            table.AddColumn("Id");
+            table.AddColumn("Duration");
+            table.AddColumn("StartTime");
+            table.AddColumn("EndTime");
+
+            // Add some rows
+            table.AddRow("Baz", "[green]Qux[/]", "3" ,"4");
+            table.Border = TableBorder.MinimalDoubleHead;
+
+            table.Centered();
+
+            // Render the table to the console
+            AnsiConsole.Write(table);
 
         }
     }

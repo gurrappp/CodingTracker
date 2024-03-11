@@ -19,7 +19,7 @@ namespace CodingTracker
         public void SetStartDateTime()
         {
             // 2024-03-01 23:59:59
-            AnsiConsole.Markup($"[blue] start time? format: yyyy-MM-dd HH:mm:ss[/]!\n");
+            AnsiConsole.Markup($"\n[blue] start time? format: yyyy-MM-dd HH:mm:ss[/]!\n");
             
             var readLine = Console.ReadLine();
 
