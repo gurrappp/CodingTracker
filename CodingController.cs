@@ -14,6 +14,11 @@ namespace CodingTracker
 
     public class CodingController
     {
+        public CodingController()
+        {
+
+        }
+
         public static void Main(string[] args)
         {
             CodingSession session = new CodingSession();
@@ -21,7 +26,9 @@ namespace CodingTracker
 
             SetupDatabase();
             StartMessage();
-            ShowSessions();
+            //ShowSessions();
+
+            userInput.ShowMenu();
 
             userInput.SetStartDateTime();
 
@@ -65,11 +72,7 @@ namespace CodingTracker
                     .Color(Color.Red));
         }
 
-        public static void Menu()
-        {
-            AnsiConsole.Markup($"[underline red] Can't parse input! using DateTime.Now[/]!");
-
-        }
+        
 
         public static void ShowSessions()
         {

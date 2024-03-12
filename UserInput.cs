@@ -37,6 +37,36 @@ namespace CodingTracker
         }
 
         public DateTime StartSession(DateTime startTime) => startTime;
-        
+
+
+        public void ShowMenu()
+        {
+            AnsiConsole.Markup($"[underline red]MENU[/]");
+            Console.WriteLine("\n---------------------");
+            Console.WriteLine("\nPlease choose one:");
+            Console.WriteLine("1 - start new session");
+            Console.WriteLine("2 - end session");
+            Console.WriteLine("3 - enter start/end times manually");
+            Console.WriteLine("4 - see X number of entries");
+
+            var command = Console.ReadLine();
+
+            switch (int.Parse(command))
+            {
+                case 1:
+
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                default:
+                    Console.WriteLine("invalid command\n");
+                    break;
+            }
+
+        }
     }
 }
