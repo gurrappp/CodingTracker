@@ -16,57 +16,43 @@ namespace CodingTracker
 
         public IFormatProvider FormatProvider = CultureInfo.CurrentCulture;
 
-        public void SetStartDateTime()
+        public void SetStartEndDateTime()
         {
             // 2024-03-01 23:59:59
             AnsiConsole.Markup($"\n[blue] start time? format: yyyy-MM-dd HH:mm:ss[/]!\n");
             
-            var readLine = Console.ReadLine();
+            var startTime = Console.ReadLine();
 
             
-
-            if (DateTime.TryParse(readLine, FormatProvider, DateTimeStyles.None, out var result))
+            if (DateTime.TryParse(startTime, FormatProvider, DateTimeStyles.None, out var startTimeResult))
             {
-                StartTime = result;
+                StartTime = startTimeResult;
             }
             else
             {
                 AnsiConsole.Markup($"[underline red] Can't parse input! using DateTime.Now[/]!");
                 StartTime = DateTime.Now;
             }
-        }
 
-        public DateTime StartSession(DateTime startTime) => startTime;
+            AnsiConsole.Markup($"\n[blue] END time? format: yyyy-MM-dd HH:mm:ss[/]!\n");
 
+            var endTime = Console.ReadLine();
 
-        public void ShowMenu()
-        {
-            AnsiConsole.Markup($"[underline red]MENU[/]");
-            Console.WriteLine("\n---------------------");
-            Console.WriteLine("\nPlease choose one:");
-            Console.WriteLine("1 - start new session");
-            Console.WriteLine("2 - end session");
-            Console.WriteLine("3 - enter start/end times manually");
-            Console.WriteLine("4 - see X number of entries");
-
-            var command = Console.ReadLine();
-
-            switch (int.Parse(command))
+            if (DateTime.TryParse(endTime, FormatProvider, DateTimeStyles.None, out var endTimeResult))
             {
-                case 1:
-
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    break;
-                case 4:
-                    break;
-                default:
-                    Console.WriteLine("invalid command\n");
-                    break;
+                EndTime = endTimeResult;
+            }
+            else
+            {
+                AnsiConsole.Markup($"[underline red] Can't parse input! using DateTime.Now[/]!");
+                EndTime = DateTime.Now;
             }
 
         }
+        
+        public DateTime StartSession(DateTime startTime) => startTime;
+
+
+        
     }
 }

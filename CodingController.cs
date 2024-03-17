@@ -7,6 +7,7 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Collections.Specialized.BitVector32;
 
 namespace CodingTracker
 {
@@ -14,28 +15,27 @@ namespace CodingTracker
 
     public class CodingController
     {
+
+        public UserInput userInput;
+        public CodingSession codingSession;
         public CodingController()
         {
-
+            userInput = new UserInput();
+            codingSession = new CodingSession();
         }
 
         public static void Main(string[] args)
         {
-            CodingSession session = new CodingSession();
-            UserInput userInput = new UserInput();
+            //var codingController = new CodingController();
+            
 
             SetupDatabase();
             StartMessage();
             //ShowSessions();
 
-            userInput.ShowMenu();
+            ShowMenu();
 
-            userInput.SetStartDateTime();
-
-            session.StartTime = userInput.StartSession(userInput.StartTime);
-
-
-            Console.ReadLine();
+            
 
         }
 
@@ -72,7 +72,38 @@ namespace CodingTracker
                     .Color(Color.Red));
         }
 
-        
+        public void ShowMenu()
+        {
+            AnsiConsole.Markup($"[underline red]MENU[/]");
+            Console.WriteLine("\n---------------------");
+            Console.WriteLine("\nPlease choose one:");
+            Console.WriteLine("1 - start new session");
+            Console.WriteLine("2 - end session");
+            Console.WriteLine("3 - enter start/end times manually");
+            Console.WriteLine("4 - see X number of entries");
+
+            var command = Console.ReadLine();
+
+            switch (int.Parse(command))
+            {
+                case 1:
+                    StartSession();
+                    break;
+                case 2:
+                    EndSession();
+                    break;
+                case 3:
+                    SetStartEndTimes();
+                    break;
+                case 4:
+                    ShowSessions();
+                    break;
+                default:
+                    Console.WriteLine("invalid command\n");
+                    break;
+            }
+
+        }
 
         public static void ShowSessions()
         {
@@ -109,6 +140,29 @@ namespace CodingTracker
 
             // Render the table to the console
             AnsiConsole.Write(table);
+
+        }
+
+        public void StartSession()
+        {
+            //userInput.SetStartDateTime();
+
+            userInput.StartTime = DateTime.Now;
+            codingSession.StartTime = userInput.StartSession(userInput.StartTime);
+
+
+            Console.ReadLine();
+        }
+
+        public void EndSession()
+        {
+            codingSession.EndTime = DateTime.Now;
+
+        }
+
+        public void SetStartEndTimes()
+        {
+            userInput.SetStartEndDateTime();
 
         }
     }
