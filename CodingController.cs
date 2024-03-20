@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using static System.Collections.Specialized.BitVector32;
+using System.Collections;
 
 namespace CodingTracker
 {
@@ -37,6 +38,7 @@ namespace CodingTracker
             SetupDatabase();
             StartMessage();
             //ShowSessions();
+
 
             codingController.ShowMenu();
 
@@ -78,35 +80,43 @@ namespace CodingTracker
 
         public void ShowMenu()
         {
-            AnsiConsole.Markup($"[underline red]MENU[/]");
-            Console.WriteLine("\n---------------------");
-            Console.WriteLine("\nPlease choose one:");
-            Console.WriteLine("1 - start new session");
-            Console.WriteLine("2 - end session");
-            Console.WriteLine("3 - enter start/end times manually");
-            Console.WriteLine("4 - see X number of entries");
-
-            var command = Console.ReadLine();
-
-            switch (int.Parse(command))
+            //Console.Clear();
+            bool closeApp = false;
+            while (!closeApp)
             {
-                case 1:
-                    StartSession();
-                    break;
-                case 2:
-                    EndSession();
-                    break;
-                case 3:
-                    SetStartEndTimes();
-                    break;
-                case 4:
-                    ShowSessions();
-                    break;
-                default:
-                    Console.WriteLine("invalid command\n");
-                    break;
-            }
+                AnsiConsole.Markup($"[underline red]MENU[/]");
+                Console.WriteLine("\n---------------------");
+                Console.WriteLine("\nPlease choose one:");
+                Console.WriteLine("1 - start new session");
+                Console.WriteLine("2 - end session");
+                Console.WriteLine("3 - enter start/end times manually");
+                Console.WriteLine("4 - see X number of entries");
+                Console.WriteLine("0 - close app");
 
+                var command = Console.ReadLine();
+
+                switch (int.Parse(command))
+                {
+                    case 0:
+                        closeApp = true;
+                        break;
+                    case 1:
+                        StartSession();
+                        break;
+                    case 2:
+                        EndSession();
+                        break;
+                    case 3:
+                        SetStartEndTimes();
+                        break;
+                    case 4:
+                        ShowSessions();
+                        break;
+                    default:
+                        Console.WriteLine("invalid command\n");
+                        break;
+                }
+            }
         }
 
         public static void ShowSessions()
@@ -123,37 +133,47 @@ namespace CodingTracker
             //grid.AddRow(new string[] { "Id", "Duration", "StartTime", "EndTime" });
             //grid.AddRow(new string[] { "Col 1", "Col 2", "Col 3" , "Col 4"});
 
-            using (var connection = new SqlConnection(connectionString))
-            {
-                var sql = "SELECT * FROM coding_habits";
-                var habits = connection.Query(sql);
-
-                foreach (var habit in habits)
-                {
-                    Console.WriteLine($"{habit} {habit.CompanyName}");
-                }
-            }
+            
 
             //// Write to Console
             //AnsiConsole.Write(grid);
 
-            // Create a table
-            var table = new Table();
+           
 
-            // Add some columns
-            table.AddColumn("Id");
-            table.AddColumn("Duration");
-            table.AddColumn("StartTime");
-            table.AddColumn("EndTime");
+            using (var connection = new SqliteConnection(connectionString))
+            {
+                var sql = "SELECT * FROM coding_habits";
+                IEnumerable<dynamic> query = connection.Query<dynamic>(sql);
+                IDictionary<string, object> fields;
+                foreach (var rows in query)
+                {
+                    fields = rows as IDictionary<string, object>;
+                   
+                    // ...
+                }
+                // Create a table
+                var table = new Table();
+
+                // Add some columns
+                table.AddColumn("Id");
+                table.AddColumn("Duration");
+                table.AddColumn("StartTime");
+                table.AddColumn("EndTime");
+
+                var listToTable = new List<string>();
+                
+                table.AddRow("", "[green]Qux[/]", "3", "4");
+                table.AddRow("Baz", "[green]Qux[/]", "3", "4");
+                table.Border = TableBorder.MinimalDoubleHead;
+
+                table.Centered();
+
+                // Render the table to the console
+                AnsiConsole.Write(table);
+            }
 
             // Add some rows
-            table.AddRow("Baz", "[green]Qux[/]", "3" ,"4");
-            table.Border = TableBorder.MinimalDoubleHead;
-
-            table.Centered();
-
-            // Render the table to the console
-            AnsiConsole.Write(table);
+           
 
         }
 
@@ -170,7 +190,18 @@ namespace CodingTracker
 
         public void EndSession()
         {
-            codingSession.EndTime = DateTime.Now;
+
+            using (var connection = new SqliteConnection(connectionString))
+            {
+                var sql = "INSERT INTO coding_habits (Id, Duration, StartTime, EndTime) VALUES (@Id, @Duration, @StartTime, @EndTime )";
+                codingSession.EndTime = DateTime.Now;
+                TimeSpan value = codingSession.EndTime.Subtract(codingSession.StartTime);
+                DateTime date = DateTime.Parse(value.ToString());
+                codingSession.Duration = date.ToString("HH:mm:ss");
+
+                connection.Execute(sql, codingSession);
+            }
+                
 
         }
 
