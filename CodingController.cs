@@ -4,9 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dapper;
 using static System.Collections.Specialized.BitVector32;
 
 namespace CodingTracker
@@ -18,22 +20,25 @@ namespace CodingTracker
 
         public UserInput userInput;
         public CodingSession codingSession;
+        public static string? connectionString;
+
         public CodingController()
         {
             userInput = new UserInput();
             codingSession = new CodingSession();
+            connectionString = ConfigurationManager.AppSettings.Get("DatabasePath");
         }
 
         public static void Main(string[] args)
         {
-            //var codingController = new CodingController();
+            var codingController = new CodingController();
             
 
             SetupDatabase();
             StartMessage();
             //ShowSessions();
 
-            ShowMenu();
+            codingController.ShowMenu();
 
             
 
@@ -42,9 +47,8 @@ namespace CodingTracker
         public static void SetupDatabase()
         {
             NameValueCollection sAll = ConfigurationManager.AppSettings;
-            string dbString = ConfigurationManager.AppSettings.Get("DatabasePath");
-
-            using (var connection = new SqliteConnection(dbString))
+            
+            using (var connection = new SqliteConnection(connectionString))
             {
                 connection.Open();
                 var cmd = connection.CreateCommand();
@@ -119,6 +123,16 @@ namespace CodingTracker
             //grid.AddRow(new string[] { "Id", "Duration", "StartTime", "EndTime" });
             //grid.AddRow(new string[] { "Col 1", "Col 2", "Col 3" , "Col 4"});
 
+            using (var connection = new SqlConnection(connectionString))
+            {
+                var sql = "SELECT * FROM coding_habits";
+                var habits = connection.Query(sql);
+
+                foreach (var habit in habits)
+                {
+                    Console.WriteLine($"{habit} {habit.CompanyName}");
+                }
+            }
 
             //// Write to Console
             //AnsiConsole.Write(grid);
