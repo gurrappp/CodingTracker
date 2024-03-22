@@ -16,7 +16,7 @@ namespace CodingTracker
 
         public IFormatProvider FormatProvider = CultureInfo.CurrentCulture;
 
-        public void SetStartEndDateTime()
+        public DateTime SetStartDateTime()
         {
             // 2024-03-01 23:59:59
             AnsiConsole.Markup($"\n[blue] start time? format: yyyy-MM-dd HH:mm:ss[/]!\n");
@@ -34,6 +34,12 @@ namespace CodingTracker
                 StartTime = DateTime.Now;
             }
 
+           return StartTime;
+        }
+
+        public DateTime SetEndDateTime()
+        {
+            
             AnsiConsole.Markup($"\n[blue] END time? format: yyyy-MM-dd HH:mm:ss[/]!\n");
 
             var endTime = Console.ReadLine();
@@ -47,9 +53,9 @@ namespace CodingTracker
                 AnsiConsole.Markup($"[underline red] Can't parse input! using DateTime.Now[/]!");
                 EndTime = DateTime.Now;
             }
-
+            return EndTime;
         }
-        
+
         public DateTime StartSession(DateTime startTime) => startTime;
 
 

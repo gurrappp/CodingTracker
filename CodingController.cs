@@ -34,15 +34,10 @@ namespace CodingTracker
         {
             var codingController = new CodingController();
             
-
             SetupDatabase();
             StartMessage();
-            //ShowSessions();
-
-
-            codingController.ShowMenu();
-
             
+            codingController.ShowMenu();
 
         }
 
@@ -91,6 +86,8 @@ namespace CodingTracker
                 Console.WriteLine("2 - end session");
                 Console.WriteLine("3 - enter start/end times manually");
                 Console.WriteLine("4 - see X number of entries");
+                Console.WriteLine("5 - see current session duration");
+
                 Console.WriteLine("0 - close app");
 
                 var command = Console.ReadLine();
@@ -112,6 +109,14 @@ namespace CodingTracker
                     case 4:
                         ShowSessions();
                         break;
+                    case 5:
+                        if (!codingSession.HasStarted)
+                        {
+                            Console.WriteLine("Session not started yet");
+                            break;
+                        }
+                        ShowCurrentSessionDuration();
+                        break;
                     default:
                         Console.WriteLine("invalid command\n");
                         break;
@@ -119,33 +124,21 @@ namespace CodingTracker
             }
         }
 
+        public void ShowCurrentSessionDuration()
+        {
+            TimeSpan value = DateTime.Now.Subtract(codingSession.StartTime);
+            DateTime date = DateTime.Parse(value.ToString());
+            
+            Console.WriteLine($"Current duration is : {date.ToString("HH:mm:ss")}\n");
+        }
+
         public static void ShowSessions()
         {
-            //var grid = new Grid();
-
-            //// Add columns 
-            //grid.AddColumn();
-            //grid.AddColumn();
-            //grid.AddColumn();
-            //grid.AddColumn();
-
-            //// Add header row 
-            //grid.AddRow(new string[] { "Id", "Duration", "StartTime", "EndTime" });
-            //grid.AddRow(new string[] { "Col 1", "Col 2", "Col 3" , "Col 4"});
-
-            
-
-            //// Write to Console
-            //AnsiConsole.Write(grid);
-
-           
-
             using (var connection = new SqliteConnection(connectionString))
             {
                 var sql = "SELECT * FROM coding_habits";
                 IEnumerable<dynamic> query = connection.Query<CodingSession>(sql);
-                IDictionary<string, object> fields;
-                var tryList = query.ToList();
+                
                 // Create a table
                 var table = new Table();
                 table.AddColumns("Id", "Duration", "StartTime", "EndTime");
@@ -158,31 +151,19 @@ namespace CodingTracker
                     
                 }
                 
-
-                // Add some columns
-                
-
-                var listToTable = new List<string>();
-
-                //table.AddRow("", "[green]Qux[/]", "3", "4");
-                //table.AddRow("Baz", "[green]Qux[/]", "3", "4");
                 table.Border = TableBorder.MinimalDoubleHead;
 
                 table.Centered();
-                //StartMessage();
+                
                 // Render the table to the console
                 AnsiConsole.Write(table);
             }
-
-            // Add some rows
-           
-
         }
 
         public void StartSession()
         {
             //userInput.SetStartDateTime();
-
+            codingSession.HasStarted = true;
             userInput.StartTime = DateTime.Now;
             codingSession.StartTime = userInput.StartSession(userInput.StartTime);
 
@@ -201,14 +182,26 @@ namespace CodingTracker
 
                 connection.Execute(sql, codingSession);
             }
-                
+
+            codingSession.HasStarted = false;
 
         }
 
         public void SetStartEndTimes()
         {
-            userInput.SetStartEndDateTime();
+            using (var connection = new SqliteConnection(connectionString))
+            {
+                var sql = "INSERT INTO coding_habits (Duration, StartTime, EndTime) VALUES (@Duration, @StartTime, @EndTime )";
 
+                codingSession.StartTime = userInput.SetStartDateTime();
+                codingSession.EndTime = userInput.SetEndDateTime();
+
+                TimeSpan value = codingSession.EndTime.Subtract(codingSession.StartTime);
+                DateTime date = DateTime.Parse(value.ToString());
+                codingSession.Duration = date.ToString("HH:mm:ss");
+
+                connection.Execute(sql, codingSession);
+            }
         }
     }
 }
