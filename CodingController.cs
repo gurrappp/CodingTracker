@@ -71,7 +71,7 @@ namespace CodingTracker
         public static void StartMessage()
         {
             //var font = FigletFont.Load("starwars.flf");
-
+            Console.Clear();
             AnsiConsole.Write(
                 new FigletText("CODING TRACKER")
                     .Centered()
@@ -94,7 +94,7 @@ namespace CodingTracker
                 Console.WriteLine("0 - close app");
 
                 var command = Console.ReadLine();
-
+                StartMessage();
                 switch (int.Parse(command))
                 {
                     case 0:
@@ -143,31 +143,33 @@ namespace CodingTracker
             using (var connection = new SqliteConnection(connectionString))
             {
                 var sql = "SELECT * FROM coding_habits";
-                IEnumerable<dynamic> query = connection.Query<dynamic>(sql);
+                IEnumerable<dynamic> query = connection.Query<CodingSession>(sql);
                 IDictionary<string, object> fields;
-                foreach (var rows in query)
-                {
-                    fields = rows as IDictionary<string, object>;
-                   
-                    // ...
-                }
+                var tryList = query.ToList();
                 // Create a table
                 var table = new Table();
+                table.AddColumns("Id", "Duration", "StartTime", "EndTime");
+                
+                foreach (CodingSession rows in query)
+                {
+                    //fields = rows as IDictionary<string, object>;
+
+                    table.AddRow(rows.Id.ToString(), rows.Duration ?? "", rows.StartTime.ToString(), rows.EndTime.ToString());
+                    
+                }
+                
 
                 // Add some columns
-                table.AddColumn("Id");
-                table.AddColumn("Duration");
-                table.AddColumn("StartTime");
-                table.AddColumn("EndTime");
+                
 
                 var listToTable = new List<string>();
-                
-                table.AddRow("", "[green]Qux[/]", "3", "4");
-                table.AddRow("Baz", "[green]Qux[/]", "3", "4");
+
+                //table.AddRow("", "[green]Qux[/]", "3", "4");
+                //table.AddRow("Baz", "[green]Qux[/]", "3", "4");
                 table.Border = TableBorder.MinimalDoubleHead;
 
                 table.Centered();
-
+                //StartMessage();
                 // Render the table to the console
                 AnsiConsole.Write(table);
             }
@@ -184,8 +186,6 @@ namespace CodingTracker
             userInput.StartTime = DateTime.Now;
             codingSession.StartTime = userInput.StartSession(userInput.StartTime);
 
-
-            Console.ReadLine();
         }
 
         public void EndSession()
@@ -193,7 +193,7 @@ namespace CodingTracker
 
             using (var connection = new SqliteConnection(connectionString))
             {
-                var sql = "INSERT INTO coding_habits (Id, Duration, StartTime, EndTime) VALUES (@Id, @Duration, @StartTime, @EndTime )";
+                var sql = "INSERT INTO coding_habits (Duration, StartTime, EndTime) VALUES (@Duration, @StartTime, @EndTime )";
                 codingSession.EndTime = DateTime.Now;
                 TimeSpan value = codingSession.EndTime.Subtract(codingSession.StartTime);
                 DateTime date = DateTime.Parse(value.ToString());
